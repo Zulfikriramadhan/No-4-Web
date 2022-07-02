@@ -68,3 +68,28 @@ class editpengaduan_F(FlaskForm):
     kategori= SelectField(u'Kategori Pengaduan', choices=[('administrasi','Pelayanan Administrasi'),('fasilitas','Fasilitas'), ('dosen','Dosen')], validators=[DataRequired()])
     detail_pengaduan= TextAreaField('Pengaduan')
     submit = SubmitField('Ubah')
+
+class artikel_F(FlaskForm):
+    judul = StringField('Judul artikel : ',validators=[DataRequired()])
+    kategori= SelectField(u'Kategori artikel : ', choices=[('ikan','Ikan'),('Action','Aksi'), ('ternate','Ternate')], validators=[DataRequired()])
+    detail_artikel= TextAreaField('Artikel')
+    submit = SubmitField('Kirim')
+
+class editartikel_F(FlaskForm):
+    subjek = StringField('Subjek',validators=[DataRequired()])
+    kategori= SelectField(u'Kategori artikel : ', choices=[('ikan','Ikan'),('Action','Aksi'), ('ternate','Ternate')], validators=[DataRequired()])
+    detail_artikel= TextAreaField('Artikel')
+    submit = SubmitField('Ubah')
+
+class surat_F(FlaskForm):
+    subjek = StringField('Pengirim : ',validators=[DataRequired()])
+    kategori= SelectField(u'Kategori Surat : ', choices=[('Resmi','Resmi'), ('non - Resmi','Non - Resmi')], validators=[DataRequired()])
+    detail_surat= TextAreaField('Isi Surat : ')
+    submit = SubmitField('Kirim')
+
+class editsurat_F(FlaskForm):
+    subjek = StringField('Pengirim :',validators=[DataRequired()])
+    kategori= SelectField(u'Kategori Surat', choices=[('Resmi','Resmi'),('non - Resmi','Non - Resmi')], validators=[DataRequired()])
+    detail_surat= TextAreaField('Pengaduan')
+    submit = SubmitField('Ubah')
+

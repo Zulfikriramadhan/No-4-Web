@@ -1,6 +1,6 @@
 from flask import Flask, render_template, redirect, url_for, Blueprint, flash,request
-from sim.mahasiswa.forms import editmahasiswa_F, mahasiswa_F, loginmahasiswa_F, pengaduan_F, editpengaduan_F
-from sim.models import Tmahasiswa,Tpengaduan
+from sim.mahasiswa.forms import artikel_F, editmahasiswa_F, mahasiswa_F, loginmahasiswa_F, pengaduan_F, editpengaduan_F, artikel_F, editartikel_F, surat_F, editsurat_F
+from sim.models import Tmahasiswa,Tpengaduan,Tartikel,Tsurat
 from sim import db, bcrypt
 from flask_login import login_user, current_user, logout_user, login_required
 import os
@@ -145,7 +145,83 @@ def detail_pengaduan(ed_id):
     dt_pengaduan=Tpengaduan.query.get_or_404(ed_id)
     return render_template('detail_pengaduan.html', dt_pengaduan=dt_pengaduan)
 
-@rmahasiswa.route("/artikel/<info>")
-def artikel_info(info):
-    return("halaman Artikel " + info)
+@rmahasiswa.route("/artikel", methods=['GET','POST'])
+@login_required
+def artikel():
+    dt_artikel= Tartikel.query.filter_by(mahasiswa_id=current_user.id)
+    form = artikel_F()
+    if form.validate_on_submit():
+        add_artikel=Tartikel(judul=form.judul.data, kategori=form.kategori.data, detail_artikel=form.detail_artikel.data)
+        db.session.add(add_artikel)
+        db.session.commit()
+        flash(f'Judul {form.judul.data} berhasil di upload','warning')
+        return redirect(url_for('rmahasiswa.artikel'))
+    return render_template("artikel.html", form=form, dt_artikel=dt_artikel)
 
+@rmahasiswa.route("/artikel/<int:ed_id>/update", methods=['GET','POST'])
+@login_required
+def update_artikel(ed_id):
+    form=editartikel_F()
+    dt_artikel=Tartikel.query.get_or_404(ed_id)
+    if request.method=="GET":
+        form.judul.data=dt_artikel.judul
+        form.kategori.data=dt_artikel.kategori
+        form.detail_artikel.data=dt_artikel.detail_artikel
+    
+    elif form.validate_on_submit():
+        dt_artikel.judul=form.judul.data
+        dt_artikel.kategori=form.kategori.data
+        dt_artikel.detail_artikel=form.detail_artikel.data
+        db.session.commit()
+        flash('Data berhasil diubah','warning')
+        return redirect(url_for('rmahasiswa.artikel'))
+
+    return render_template('edit_artikel.html', form=form)
+
+@rmahasiswa.route("/surat", methods=['GET','POST'])
+@login_required
+def surat():
+    dt_surat= Tsurat.query.filter_by(mahasiswa_id=current_user.id)
+    form = surat_F()
+    if form.validate_on_submit():
+        add_surat=Tsurat(subjek=form.subjek.data, kategori=form.kategori.data, detail_surat=form.detail_surat.data, mahasiswa=current_user)
+        db.session.add(add_surat)
+        db.session.commit()
+        flash(f'Surat {form.subjek.data} berhasil di upload','warning')
+        return redirect(url_for('rmahasiswa.surat'))
+    return render_template("surat.html", form=form, dt_surat=dt_surat)
+
+@rmahasiswa.route("/surat/<int:ed_id>/update", methods=['GET','POST'])
+@login_required
+def update_surat(ed_id):
+    form=editsurat_F()
+    dt_surat=Tsurat.query.get_or_404(ed_id)
+    if request.method=="GET":
+        form.subjek.data=dt_surat.subjek
+        form.kategori.data=dt_surat.kategori
+        form.detail_surat.data=dt_surat.detail_surat
+    
+    elif form.validate_on_submit():
+        dt_surat.subjek=form.subjek.data
+        dt_surat.kategori=form.kategori.data
+        dt_surat.detail_pengaduan=form.detail_surat.data
+        db.session.commit()
+        flash('Data berhasil diubah','warning')
+        return redirect(url_for('rmahasiswa.surat'))
+
+    return render_template('edit_surat.html', form=form)
+
+@rmahasiswa.route("/surat/<int:ed_id>/detail", methods=['GET','POST'])
+@login_required
+def detail_surat(ed_id):
+    dt_surat=Tsurat.query.get_or_404(ed_id)
+    return render_template('detail_surat.html', dt_surat=dt_surat)
+
+@rmahasiswa.route("/delet/<id>", methods=['GET','POST'])
+@login_required
+def hapus_surat(id):
+    h_surat=Tsurat.query.get(id)
+    db.session.delete(h_surat)
+    db.session.commit()
+    flash('Data berhasil di hapus','danger')
+    return redirect(url_for('rmahasiswa.surat'))
